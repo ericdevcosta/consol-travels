@@ -2,16 +2,17 @@ export default function BrandBackground() {
   return (
     <>
       {/* Luz azul */}
-      <div className="absolute right-[-120px] top-16 h-96 w-96 rounded-full bg-sky-100/60 blur-3xl" />
+      <div className="absolute right-[-80px] top-16 h-72 w-72 rounded-full bg-sky-100/60 blur-3xl md:right-[-120px] md:h-96 md:w-96" />
 
       {/* Luz areia */}
-      <div className="absolute left-[-160px] bottom-20 h-72 w-72 rounded-full bg-amber-50 blur-3xl" />
+      <div className="absolute bottom-20 left-[-100px] h-60 w-60 rounded-full bg-amber-50 blur-3xl md:left-[-160px] md:h-72 md:w-72" />
 
-      {/* Linha superior */}
+      {/* Linhas decorativas */}
       <svg
         className="absolute inset-0 h-full w-full opacity-20"
         viewBox="0 0 1600 900"
         preserveAspectRatio="none"
+        aria-hidden="true"
       >
         <path
           d="M-100 250 C300 120 700 380 1100 220 C1400 100 1700 250 1800 180"
@@ -35,5 +36,5 @@ export default function BrandBackground() {
         />
       </svg>
     </>
-);
+  );
 }

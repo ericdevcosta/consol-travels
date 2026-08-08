@@ -68,6 +68,13 @@ export const siteData = {
       photoUrl:
         "https://unsplash.com/photos/the-sun-is-setting-behind-a-bridge-over-water-FRqxfw-rSro?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
     },
+    description:
+        "Descubra Lisboa, uma cidade encantadora que combina história, cultura, gastronomia e paisagens inesquecíveis.",
+    highlights: [
+        "Centro histórico e bairros tradicionais",
+        "Torre de Belém e Mosteiro dos Jerónimos",
+        "Gastronomia e cultura portuguesa",
+    ],
   },
 
   {
@@ -82,6 +89,13 @@ export const siteData = {
       photoUrl:
         "https://unsplash.com/photos/time-square-new-york-during-daytime-TaCk3NspYe0?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
     },
+    description:
+        "Viva a energia de Nova York, com seus arranha-céus, cultura, gastronomia e atrações mundialmente famosas.",
+    highlights: [
+        "Times Square e Manhattan",
+        "Central Park e principais atrações",
+        "Gastronomia, compras e entretenimento",
+    ],
   },
 
   {
@@ -96,6 +110,13 @@ export const siteData = {
       photoUrl:
         "https://unsplash.com/photos/the-eiffel-tower-towering-over-the-city-of-paris-uYrACAHq6jI?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
     },
+    description:
+        "Explore Paris, uma cidade repleta de história, arte, gastronomia e alguns dos monumentos mais conhecidos do mundo.",
+    highlights: [
+        "Torre Eiffel e principais monumentos",
+        "Museus, arte e cultura",
+        "Gastronomia e experiências parisienses",
+    ],
   },
 
   {
@@ -110,6 +131,13 @@ export const siteData = {
       photoUrl:
         "https://unsplash.com/photos/mount-fuji-japan-N4DbvTUDikw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
     },
+    description:
+        "Conheça Tóquio, onde tradição e tecnologia se encontram em uma das cidades mais fascinantes do mundo.",
+    highlights: [
+        "Templos e cultura tradicional japonesa",
+        "Tecnologia e bairros modernos",
+        "Gastronomia e experiências únicas",
+    ],
   },
 
   {
@@ -124,6 +152,13 @@ export const siteData = {
       photoUrl:
         "https://unsplash.com/photos/a-city-with-many-buildings-Zcyl-HLP5IY?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
     },
+    description:
+        "Viaje por Roma e descubra séculos de história, arquitetura, cultura e sabores da tradicional culinária italiana.",
+    highlights: [
+        "Coliseu e Fórum Romano",
+        "Vaticano e patrimônio histórico",
+        "Gastronomia e cultura italiana",
+    ],
   },
 
   {
@@ -138,6 +173,13 @@ export const siteData = {
       photoUrl:
         "https://unsplash.com/photos/brown-and-green-rock-formation-on-blue-sea-under-white-clouds-and-blue-sky-during-daytime-h-UU2PnN5a0?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText",
     },
+    description:
+        "Conheça Fernando de Noronha, um paraíso brasileiro com praias paradisíacas, natureza preservada e águas cristalinas.",
+    highlights: [
+        "Praias paradisíacas e águas cristalinas",
+        "Mergulho e vida marinha",
+        "Natureza preservada e trilhas",
+    ],
   },
 ],
     advantages: [

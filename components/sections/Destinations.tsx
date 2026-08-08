@@ -15,11 +15,13 @@ export default function Destinations() {
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {siteData.destinations.map((destination) => (
             <DestinationCard
-              key={destination.country}
-              country={destination.country}
-              city={destination.city}
-              image={destination.image}
-              whatsapp={siteData.contact.whatsapp}
+            key={destination.country}
+            country={destination.country}
+            city={destination.city}
+            image={destination.image}
+            description={destination.description}
+            highlights={destination.highlights}
+            whatsapp={siteData.contact.whatsapp}
             />
           ))}
         </div>
