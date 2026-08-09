@@ -4,11 +4,18 @@ import {
   AtSign,
 } from "lucide-react";
 
-import Button from "@/components/ui/Button";
 import SectionTitle from "@/components/ui/SectionTitle";
 import { siteData } from "@/data/site";
 
 export default function Contact() {
+  const whatsappUrl = `https://wa.me/${siteData.contact.whatsapp}?text=Olá! Gostaria de solicitar um orçamento para uma viagem.`;
+
+  const emailUrl = `mailto:${siteData.contact.email}`;
+
+  const instagramUrl =
+    siteData.contact.instagramUrl ||
+    "https://www.instagram.com/consoltravels/";
+
   return (
     <section
       id="contato"
@@ -22,9 +29,16 @@ export default function Contact() {
         />
 
         <div className="mt-14 grid gap-8 md:grid-cols-3">
-          <div>
+
+          {/* WhatsApp */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-2xl p-4 transition hover:bg-white hover:shadow-md"
+          >
             <MessageCircle
-              className="mx-auto mb-4 text-blue-600"
+              className="mx-auto mb-4 text-blue-600 transition-transform group-hover:scale-110"
               size={36}
             />
 
@@ -35,11 +49,15 @@ export default function Contact() {
             <p className="mt-2 text-slate-600">
               Atendimento rápido e personalizado.
             </p>
-          </div>
+          </a>
 
-          <div>
+          {/* E-mail */}
+          <a
+            href={emailUrl}
+            className="group rounded-2xl p-4 transition hover:bg-white hover:shadow-md"
+          >
             <Mail
-              className="mx-auto mb-4 text-blue-600"
+              className="mx-auto mb-4 text-blue-600 transition-transform group-hover:scale-110"
               size={36}
             />
 
@@ -50,12 +68,18 @@ export default function Contact() {
             <p className="mt-2 text-slate-600">
               {siteData.contact.email}
             </p>
-          </div>
+          </a>
 
-          <div>
+          {/* Instagram */}
+          <a
+            href={instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-2xl p-4 transition hover:bg-white hover:shadow-md"
+          >
             <AtSign
-                className="mx-auto mb-4 text-blue-600"
-                size={36}
+              className="mx-auto mb-4 text-blue-600 transition-transform group-hover:scale-110"
+              size={36}
             />
 
             <h3 className="font-semibold text-blue-950">
@@ -65,15 +89,8 @@ export default function Contact() {
             <p className="mt-2 text-slate-600">
               {siteData.contact.instagram}
             </p>
-          </div>
-        </div>
+          </a>
 
-        <div className="mt-14">
-          <Button
-            href={`https://wa.me/${siteData.contact.whatsapp}?text=Olá! Gostaria de solicitar um orçamento para uma viagem.`}
-          >
-            Solicitar orçamento
-          </Button>
         </div>
       </div>
     </section>

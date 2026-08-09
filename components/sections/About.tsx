@@ -11,7 +11,7 @@ export default function About() {
       <div className="mx-auto grid max-w-7xl items-center gap-20 px-6 lg:grid-cols-2">
         <div className="overflow-hidden rounded-3xl shadow-xl">
           <Image
-            src="/images/about/travel-planning.jpg"
+            src={siteData.about.image}
             alt="Planejamento de viagem"
             width={700}
             height={800}
@@ -21,7 +21,7 @@ export default function About() {
 
         <div>
           <SectionTitle
-            eyebrow="Sobre nós"
+            eyebrow={siteData.about.eyebrow}
             title={siteData.about.title}
             subtitle={siteData.about.description}
           />
@@ -30,7 +30,7 @@ export default function About() {
             {siteData.about.highlights.map((item) => (
               <div key={item} className="flex items-center gap-4">
                 <CheckCircle2
-                  className="text-blue-600"
+                  className="shrink-0 text-blue-600"
                   size={24}
                 />
 
