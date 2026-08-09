@@ -26,7 +26,7 @@ export default function DestinationCard({
   return (
     <>
       <div className="group overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl">
-        <div className="relative h-80 overflow-hidden">
+        <div className="relative h-64 overflow-hidden">
             <Image
                 src={image}
                 alt={`${country} - ${city}`}
