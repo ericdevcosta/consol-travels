@@ -27,13 +27,13 @@ export default function DestinationCard({
     <>
       <div className="group overflow-hidden rounded-3xl bg-white shadow-lg transition hover:-translate-y-2 hover:shadow-2xl">
         <div className="relative h-64 overflow-hidden">
-            <Image
-                src={image}
-                alt={`${country} - ${city}`}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                className="object-cover transition duration-500 group-hover:scale-110"
-            />
+          <Image
+            src={image}
+            alt={`${country} - ${city}`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover transition duration-500 group-hover:scale-110"
+          />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
@@ -51,21 +51,13 @@ export default function DestinationCard({
             {description}
           </p>
 
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={() => setIsOpen(true)}
-              className="w-full rounded-xl border border-blue-700 px-6 py-3 font-semibold text-blue-700 transition hover:bg-blue-50"
-            >
-              Conhecer destino
-            </button>
-
-            <Button
-              href={`https://wa.me/${whatsapp}?text=Olá! Gostaria de um orçamento para ${country}.`}
-            >
-              Solicitar orçamento
-            </Button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="w-full rounded-xl border border-blue-700 px-6 py-3 font-semibold text-blue-700 transition hover:bg-blue-50"
+          >
+            Conhecer destino
+          </button>
         </div>
       </div>
 

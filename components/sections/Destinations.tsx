@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SectionTitle from "@/components/ui/SectionTitle";
 import DestinationCard from "@/components/ui/DestinationCard";
 import { siteData } from "@/data/site";
@@ -9,20 +9,45 @@ export default function Destinations() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const handleScroll = () => {
-    const carousel = carouselRef.current;
+  useEffect(() => {
+    const container = carouselRef.current;
 
-    if (!carousel) return;
+    if (!container) return;
 
-    const scrollLeft = carousel.scrollLeft;
-    const cardWidth = carousel.clientWidth * 0.85 + 24;
+    const cards = Array.from(
+      container.children
+    ) as HTMLElement[];
 
-    const index = Math.round(scrollLeft / cardWidth);
+    if (cards.length === 0) return;
 
-    setActiveIndex(
-      Math.min(index, siteData.destinations.length - 1)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleCards = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
+          );
+
+        if (visibleCards.length === 0) return;
+
+        const activeCard = visibleCards[0].target as HTMLElement;
+        const index = cards.indexOf(activeCard);
+
+        if (index !== -1) {
+          setActiveIndex(index);
+        }
+      },
+      {
+        root: container,
+        threshold: [0.5, 0.75, 0.9],
+      }
     );
-  };
+
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section id="destinos" className="bg-white py-24">
@@ -37,8 +62,11 @@ export default function Destinations() {
         <div className="md:hidden">
           <div
             ref={carouselRef}
-            onScroll={handleScroll}
             className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-6"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
           >
             {siteData.destinations.map((destination) => (
               <div
@@ -59,16 +87,18 @@ export default function Destinations() {
 
           {/* Indicadores */}
           <div className="flex justify-center gap-2 pt-2">
-            {siteData.destinations.map((destination, index) => (
-              <span
-                key={destination.country}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === activeIndex
-                    ? "w-5 bg-blue-700"
-                    : "w-2 bg-slate-300"
-                }`}
-              />
-            ))}
+            {siteData.destinations.map(
+              (destination, index) => (
+                <span
+                  key={destination.country}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === activeIndex
+                      ? "w-5 bg-blue-700"
+                      : "w-2 bg-slate-300"
+                  }`}
+                />
+              )
+            )}
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import SectionTitle from "@/components/ui/SectionTitle";
 import ServiceCard from "@/components/ui/ServiceCard";
 import { siteData } from "@/data/site";
@@ -26,7 +27,154 @@ const icons = {
 };
 
 export default function Services() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
+  const desktopCarouselRef = useRef<HTMLDivElement>(null);
+
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
+  const [desktopActiveIndex, setDesktopActiveIndex] = useState(0);
+  const [isDesktopHovered, setIsDesktopHovered] = useState(false);
+
+  const updateMobileIndex = () => {
+    const carousel = mobileCarouselRef.current;
+
+    if (!carousel) return;
+
+    const cards = Array.from(carousel.children) as HTMLElement[];
+
+    if (!cards.length) return;
+
+    const scrollPosition = carousel.scrollLeft;
+
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    cards.forEach((card, index) => {
+      const distance = Math.abs(card.offsetLeft - scrollPosition);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    setMobileActiveIndex(
+      Math.min(closestIndex, siteData.services.length - 1)
+    );
+  };
+
+  const updateDesktopIndex = () => {
+    const carousel = desktopCarouselRef.current;
+
+    if (!carousel) return;
+
+    const cards = Array.from(carousel.children) as HTMLElement[];
+
+    if (!cards.length) return;
+
+    const scrollPosition = carousel.scrollLeft;
+
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    cards.forEach((card, index) => {
+      const distance = Math.abs(card.offsetLeft - scrollPosition);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    setDesktopActiveIndex(
+      Math.min(closestIndex, siteData.services.length - 1)
+    );
+  };
+
+  useEffect(() => {
+    const carousel = desktopCarouselRef.current;
+
+    if (!carousel) return;
+
+    const interval = window.setInterval(() => {
+      if (isDesktopHovered) return;
+
+      const cards = Array.from(carousel.children) as HTMLElement[];
+
+      if (!cards.length) return;
+
+      const currentIndex = desktopActiveIndex;
+      const nextIndex =
+        currentIndex >= cards.length - 1 ? 0 : currentIndex + 1;
+
+      carousel.scrollTo({
+        left: cards[nextIndex].offsetLeft,
+        behavior: "smooth",
+      });
+
+      setDesktopActiveIndex(nextIndex);
+    }, 4500);
+
+    return () => window.clearInterval(interval);
+  }, [desktopActiveIndex, isDesktopHovered]);
+
+  useEffect(() => {
+    const carousel = mobileCarouselRef.current;
+
+    if (!carousel) return;
+
+    const interval = window.setInterval(() => {
+      const cards = Array.from(carousel.children) as HTMLElement[];
+
+      if (!cards.length) return;
+
+      const currentIndex = mobileActiveIndex;
+      const nextIndex =
+        currentIndex >= cards.length - 1 ? 0 : currentIndex + 1;
+
+      carousel.scrollTo({
+        left: cards[nextIndex].offsetLeft,
+        behavior: "smooth",
+      });
+
+      setMobileActiveIndex(nextIndex);
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, [mobileActiveIndex]);
+
+  const scrollToMobile = (index: number) => {
+    const carousel = mobileCarouselRef.current;
+
+    if (!carousel) return;
+
+    const card = carousel.children[index] as HTMLElement | undefined;
+
+    if (!card) return;
+
+    carousel.scrollTo({
+      left: card.offsetLeft,
+      behavior: "smooth",
+    });
+
+    setMobileActiveIndex(index);
+  };
+
+  const scrollToDesktop = (index: number) => {
+    const carousel = desktopCarouselRef.current;
+
+    if (!carousel) return;
+
+    const card = carousel.children[index] as HTMLElement | undefined;
+
+    if (!card) return;
+
+    carousel.scrollTo({
+      left: card.offsetLeft,
+      behavior: "smooth",
+    });
+
+    setDesktopActiveIndex(index);
+  };
 
   return (
     <section
@@ -43,24 +191,9 @@ export default function Services() {
         {/* MOBILE */}
         <div className="md:hidden">
           <div
+            ref={mobileCarouselRef}
+            onScroll={updateMobileIndex}
             className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory"
-            onScroll={(event) => {
-              const container = event.currentTarget;
-              const scrollPosition = container.scrollLeft;
-              const cardWidth =
-                container.clientWidth * 0.88 + 20;
-
-              const index = Math.round(
-                scrollPosition / cardWidth
-              );
-
-              setActiveIndex(
-                Math.min(
-                  index,
-                  siteData.services.length - 1
-                )
-              );
-            }}
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
@@ -85,13 +218,16 @@ export default function Services() {
             })}
           </div>
 
-          {/* Indicador do carrossel */}
+          {/* Indicadores mobile */}
           <div className="mt-5 flex justify-center gap-2">
             {siteData.services.map((service, index) => (
-              <span
+              <button
                 key={service.title}
+                type="button"
+                aria-label={`Ir para o serviço ${index + 1}: ${service.title}`}
+                onClick={() => scrollToMobile(index)}
                 className={`h-2 rounded-full transition-all duration-300 ${
-                  index === activeIndex
+                  index === mobileActiveIndex
                     ? "w-6 bg-blue-700"
                     : "w-2 bg-slate-300"
                 }`}
@@ -101,31 +237,55 @@ export default function Services() {
         </div>
 
         {/* DESKTOP */}
-        <div className="hidden md:grid md:grid-cols-2 md:gap-8 xl:grid-cols-6">
-          {siteData.services.map((service, index) => {
-            const Icon =
-              icons[service.icon as keyof typeof icons];
+        <div
+          className="hidden md:block"
+          onMouseEnter={() => setIsDesktopHovered(true)}
+          onMouseLeave={() => setIsDesktopHovered(false)}
+        >
+          <div
+            ref={desktopCarouselRef}
+            onScroll={updateDesktopIndex}
+            className="flex gap-8 overflow-x-auto pb-6 snap-x snap-mandatory"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {siteData.services.map((service) => {
+              const Icon =
+                icons[service.icon as keyof typeof icons];
 
-            const isLast =
-              index === siteData.services.length - 1;
+              return (
+                <div
+                  key={service.title}
+                  className="w-[calc((100%-4rem)/3)] shrink-0 snap-start"
+                >
+                  <ServiceCard
+                    icon={Icon}
+                    title={service.title}
+                    description={service.description}
+                  />
+                </div>
+              );
+            })}
+          </div>
 
-            return (
-              <div
+          {/* Indicadores desktop */}
+          <div className="mt-5 flex justify-center gap-2">
+            {siteData.services.map((service, index) => (
+              <button
                 key={service.title}
-                className={
-                  isLast
-                    ? "xl:col-span-2 xl:col-start-3"
-                    : "xl:col-span-2"
-                }
-              >
-                <ServiceCard
-                  icon={Icon}
-                  title={service.title}
-                  description={service.description}
-                />
-              </div>
-            );
-          })}
+                type="button"
+                aria-label={`Ir para o serviço ${index + 1}: ${service.title}`}
+                onClick={() => scrollToDesktop(index)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === desktopActiveIndex
+                    ? "w-6 bg-blue-700"
+                    : "w-2 bg-slate-300"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

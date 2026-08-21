@@ -5,6 +5,8 @@ import Destinations from "@/components/sections/Destinations";
 import Advantages from "@/components/sections/Advantages";
 import About from "@/components/sections/About";
 import Contact from "@/components/sections/Contact";
+import Footer from "@/components/layout/Footer";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 export default function Home() {
   return (
@@ -19,6 +21,10 @@ export default function Home() {
         <About />
         <Contact />
       </main>
+
+      <Footer />
+
+      <WhatsAppButton />
     </>
   );
 }
