@@ -3,26 +3,25 @@
 import { useEffect, useRef, useState } from "react";
 
 import SectionTitle from "@/components/ui/SectionTitle";
-
 import DestinationCard from "@/components/ui/DestinationCard";
-
+import type { Destination } from "@/lib/google-sheets";
 import { siteData } from "@/data/site";
 
-export default function Destinations() {
-  const mobileCarouselRef =
-    useRef<HTMLDivElement>(null);
+type DestinationsProps = {
+  destinations: Destination[];
+};
 
-  const desktopCarouselRef =
-    useRef<HTMLDivElement>(null);
+export default function Destinations({
+  destinations,
+}: DestinationsProps) {
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
+  const desktopCarouselRef = useRef<HTMLDivElement>(null);
 
-  const [mobileActiveIndex, setMobileActiveIndex] =
-    useState(0);
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
+  const [desktopActiveIndex, setDesktopActiveIndex] = useState(0);
+  const [isDesktopHovered, setIsDesktopHovered] = useState(false);
 
-  const [desktopActiveIndex, setDesktopActiveIndex] =
-    useState(0);
-
-  const [isDesktopHovered, setIsDesktopHovered] =
-    useState(false);
+  const whatsapp = siteData.contact.whatsapp;
 
   useEffect(() => {
     const container = mobileCarouselRef.current;
@@ -41,8 +40,7 @@ export default function Destinations() {
           .filter((entry) => entry.isIntersecting)
           .sort(
             (a, b) =>
-              b.intersectionRatio -
-              a.intersectionRatio
+              b.intersectionRatio - a.intersectionRatio
           );
 
         if (visibleCards.length === 0) return;
@@ -62,12 +60,10 @@ export default function Destinations() {
       }
     );
 
-    cards.forEach((card) =>
-      observer.observe(card)
-    );
+    cards.forEach((card) => observer.observe(card));
 
     return () => observer.disconnect();
-  }, []);
+  }, [destinations.length]);
 
   useEffect(() => {
     const container = mobileCarouselRef.current;
@@ -97,11 +93,10 @@ export default function Destinations() {
     }, 5000);
 
     return () => window.clearInterval(interval);
-  }, []);
+  }, [destinations.length]);
 
   const updateDesktopIndex = () => {
-    const carousel =
-      desktopCarouselRef.current;
+    const carousel = desktopCarouselRef.current;
 
     if (!carousel) return;
 
@@ -128,16 +123,12 @@ export default function Destinations() {
     });
 
     setDesktopActiveIndex(
-      Math.min(
-        closestIndex,
-        siteData.destinations.length - 1
-      )
+      Math.min(closestIndex, destinations.length - 1)
     );
   };
 
   useEffect(() => {
-    const carousel =
-      desktopCarouselRef.current;
+    const carousel = desktopCarouselRef.current;
 
     if (!carousel) return;
 
@@ -150,8 +141,7 @@ export default function Destinations() {
 
       if (!cards.length) return;
 
-      const currentIndex =
-        desktopActiveIndex;
+      const currentIndex = desktopActiveIndex;
 
       const nextIndex =
         currentIndex >= cards.length - 1
@@ -166,18 +156,15 @@ export default function Destinations() {
       setDesktopActiveIndex(nextIndex);
     }, 4500);
 
-    return () =>
-      window.clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [
     desktopActiveIndex,
     isDesktopHovered,
+    destinations.length,
   ]);
 
-  const scrollToDesktop = (
-    index: number
-  ) => {
-    const carousel =
-      desktopCarouselRef.current;
+  const scrollToDesktop = (index: number) => {
+    const carousel = desktopCarouselRef.current;
 
     if (!carousel) return;
 
@@ -217,113 +204,87 @@ export default function Destinations() {
               msOverflowStyle: "none",
             }}
           >
-            {siteData.destinations.map(
-              (destination) => (
-                <div
-                  key={destination.country}
-                  className="w-[85vw] shrink-0 snap-center"
-                >
-                  <DestinationCard
-                    country={destination.country}
-                    city={destination.city}
-                    image={destination.image}
-                    description={
-                      destination.description
-                    }
-                    highlights={
-                      destination.highlights
-                    }
-                    whatsapp={
-                      siteData.contact.whatsapp
-                    }
-                  />
-                </div>
-              )
-            )}
+            {destinations.map((destination) => (
+              <div
+                key={`${destination.country}-${destination.city}`}
+                className="w-[85vw] shrink-0 snap-center"
+              >
+                <DestinationCard
+                  country={destination.country}
+                  city={destination.city}
+                  image={destination.image}
+                  description={destination.description}
+                  highlights={destination.highlights}
+                  whatsapp={whatsapp}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Indicadores mobile */}
           <div className="flex justify-center gap-2 pt-2">
-            {siteData.destinations.map(
-              (destination, index) => (
-                <span
-                  key={destination.country}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === mobileActiveIndex
-                      ? "w-5 bg-blue-700"
-                      : "w-2 bg-slate-300"
-                  }`}
-                />
-              )
-            )}
+            {destinations.map((destination, index) => (
+              <span
+                key={`${destination.country}-${destination.city}`}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === mobileActiveIndex
+                    ? "w-5 bg-blue-700"
+                    : "w-2 bg-slate-300"
+                }`}
+              />
+            ))}
           </div>
         </div>
 
         {/* Desktop: carrossel */}
         <div
           className="hidden md:block"
-          onMouseEnter={() =>
-            setIsDesktopHovered(true)
-          }
-          onMouseLeave={() =>
-            setIsDesktopHovered(false)
-          }
+          onMouseEnter={() => setIsDesktopHovered(true)}
+          onMouseLeave={() => setIsDesktopHovered(false)}
         >
           <div
             ref={desktopCarouselRef}
             onScroll={updateDesktopIndex}
-            className="flex gap-8 overflow-x-auto pb-6 snap-x snap-mandatory"
+            className="flex snap-x snap-mandatory gap-8 overflow-x-auto pb-6"
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
             }}
           >
-            {siteData.destinations.map(
-              (destination) => (
-                <div
-                  key={destination.country}
-                  className="w-[calc((100%-4rem)/3)] shrink-0 snap-start"
-                >
-                  <DestinationCard
-                    country={destination.country}
-                    city={destination.city}
-                    image={destination.image}
-                    description={
-                      destination.description
-                    }
-                    highlights={
-                      destination.highlights
-                    }
-                    whatsapp={
-                      siteData.contact.whatsapp
-                    }
-                  />
-                </div>
-              )
-            )}
+            {destinations.map((destination) => (
+              <div
+                key={`${destination.country}-${destination.city}`}
+                className="w-[calc((100%-4rem)/3)] shrink-0 snap-start"
+              >
+                <DestinationCard
+                  country={destination.country}
+                  city={destination.city}
+                  image={destination.image}
+                  description={destination.description}
+                  highlights={destination.highlights}
+                  whatsapp={whatsapp}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Indicadores desktop */}
           <div className="mt-5 flex justify-center gap-2">
-            {siteData.destinations.map(
-              (destination, index) => (
-                <button
-                  key={destination.country}
-                  type="button"
-                  aria-label={`Ir para o destino ${
-                    index + 1
-                  }: ${destination.city}`}
-                  onClick={() =>
-                    scrollToDesktop(index)
-                  }
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === desktopActiveIndex
-                      ? "w-6 bg-blue-700"
-                      : "w-2 bg-slate-300"
-                  }`}
-                />
-              )
-            )}
+            {destinations.map((destination, index) => (
+              <button
+                key={`${destination.country}-${destination.city}`}
+                type="button"
+                aria-label={`Ir para o destino ${
+                  index + 1
+                }: ${destination.city}`}
+                onClick={() => scrollToDesktop(index)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === desktopActiveIndex
+                    ? "w-6 bg-blue-700"
+                    : "w-2 bg-slate-300"
+                }`}
+              />
+            ))}
           </div>
         </div>
       </div>

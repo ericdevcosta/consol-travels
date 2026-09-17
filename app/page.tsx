@@ -8,7 +8,11 @@ import Contact from "@/components/sections/Contact";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
-export default function Home() {
+import { getDestinations } from "@/lib/google-sheets";
+
+export default async function Home() {
+  const destinations = await getDestinations();
+
   return (
     <>
       <Navbar />
@@ -16,14 +20,13 @@ export default function Home() {
       <main className="bg-gradient-to-b from-blue-50/40 to-white">
         <Hero />
         <Services />
-        <Destinations />
+        <Destinations destinations={destinations} />
         <Advantages />
         <About />
         <Contact />
       </main>
 
       <Footer />
-
       <WhatsAppButton />
     </>
   );
