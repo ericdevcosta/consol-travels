@@ -2,7 +2,7 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { GoogleAuth } from "google-auth-library";
+import { google } from "googleapis";
 
 import { siteData } from "@/data/site";
 
@@ -30,7 +30,7 @@ type ServiceAccountCredentials = {
   project_id?: string;
 };
 
-const SPREADSHEET_ID =
+const DEFAULT_SPREADSHEET_ID =
   "1t7va-n7oXrxIAvOqM3_6xayCaoBCykCtKiIa3RWMwjg";
 
 const SHEET_RANGE = "Destinos!A:G";
@@ -76,19 +76,42 @@ function getFallbackDestinations(): Destination[] {
   }));
 }
 
-function getCredentials(): ServiceAccountCredentials | null {
+function getCredentialsFromEnvironment():
+  | ServiceAccountCredentials
+  | null {
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
+
+  if (!clientEmail || !privateKey) {
+    return null;
+  }
+
+  return {
+    client_email: clientEmail,
+    private_key: privateKey.replace(/\\n/g, "\n"),
+  };
+}
+
+function getCredentialsFromFile():
+  | ServiceAccountCredentials
+  | null {
   const serviceAccountPath = join(
     process.cwd(),
     "google-service-account.json"
   );
 
   try {
-    const fileContent = readFileSync(serviceAccountPath, "utf-8");
+    const fileContent = readFileSync(
+      serviceAccountPath,
+      "utf-8"
+    );
 
-    return JSON.parse(fileContent) as ServiceAccountCredentials;
+    return JSON.parse(
+      fileContent
+    ) as ServiceAccountCredentials;
   } catch (error) {
     console.warn(
-      "Google Sheets: arquivo de credenciais não encontrado ou inválido. Usando fallback.",
+      "Google Sheets: arquivo de credenciais não encontrado ou inválido.",
       error
     );
 
@@ -96,56 +119,51 @@ function getCredentials(): ServiceAccountCredentials | null {
   }
 }
 
+function getCredentials(): ServiceAccountCredentials | null {
+  const environmentCredentials =
+    getCredentialsFromEnvironment();
+
+  if (environmentCredentials) {
+    return environmentCredentials;
+  }
+
+  return getCredentialsFromFile();
+}
+
 export async function getDestinations(): Promise<Destination[]> {
   const credentials = getCredentials();
 
   if (!credentials) {
+    console.warn(
+      "Google Sheets: credenciais não encontradas. Usando fallback."
+    );
+
     return getFallbackDestinations();
   }
 
+  const spreadsheetId =
+    process.env.GOOGLE_SHEETS_SPREADSHEET_ID ||
+    DEFAULT_SPREADSHEET_ID;
+
   try {
-    const auth = new GoogleAuth({
+    const auth = new google.auth.GoogleAuth({
       credentials,
       scopes: [
         "https://www.googleapis.com/auth/spreadsheets.readonly",
       ],
     });
 
-    const client = await auth.getClient();
-    const accessTokenResponse = await client.getAccessToken();
-    const accessToken = accessTokenResponse.token;
+    const sheets = google.sheets({
+      version: "v4",
+      auth,
+    });
 
-    if (!accessToken) {
-      throw new Error(
-        "Não foi possível obter o token de acesso do Google."
-      );
-    }
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: SHEET_RANGE,
+    });
 
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(
-        SHEET_RANGE
-      )}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        cache: "no-store",
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-
-      throw new Error(
-        `Google Sheets API respondeu ${response.status}: ${errorText}`
-      );
-    }
-
-    const data = (await response.json()) as {
-      values?: string[][];
-    };
-
-    const values = data.values;
+    const values = response.data.values;
 
     if (!values || values.length < 2) {
       console.warn(
