@@ -10,6 +10,8 @@ import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 import { getDestinations } from "@/lib/google-sheets";
 
+export const revalidate = 60;
+
 export default async function Home() {
   const destinations = await getDestinations();
 
